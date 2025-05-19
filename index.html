@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 CRAZY TIC-TAC-TOE 🔥</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            padding: 20px;
+            width: 340px;
+            text-align: center;
+            border: 3px solid #00ffcc;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-top: 0;
+            text-shadow: 0 0 10px #ff00ff;
+            font-size: 28px;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ff00ff; }
+            to { text-shadow: 0 0 20px #00ffff; }
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            margin: 20px auto;
+            width: 260px;
+            height: 260px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .tile {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-sizing: border-box;
+        }
+        
+        .tile:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.95) rotate(5deg);
+        }
+        
+        .tile.x::before {
+            content: "❌";
+            position: absolute;
+            animation: dropIn 0.5s ease-out, float 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 5px red);
+        }
+        
+        .tile.o::before {
+            content: "⭕";
+            position: absolute;
+            animation: dropIn 0.5s ease-out, float 3s infinite ease-in-out;
+            filter: drop-shadow(0 0 5px cyan);
+        }
+        
+        @keyframes dropIn {
+            0% { transform: translateY(-100px) rotate(-180deg); opacity: 0; }
+            100% { transform: translateY(0) rotate(0); opacity: 1; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff00cc, #00ccff);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(255, 0, 255, 0.6);
+        }
+        
+        .game-rules {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+            font-size: 14px;
+            border: 1px dashed #00ffcc;
+        }
+        
+        .game-rules h3 {
+            margin-top: 0;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .game-rules ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        .footer a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .advertisement {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-style: italic;
+            color: #ccc;
+            border: 1px dashed #ff00ff;
+        }
+        
+        /* CRAZY EFFECTS */
+        .explosion {
+            position: absolute;
+            font-size: 30px;
+            animation: explode 1s forwards;
+            z-index: 100;
+            pointer-events: none;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        .glitch {
+            animation: glitch 0.5s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(45deg, #ff00cc, #00ccff);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            animation: modalFadeIn 0.5s ease-out;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+            border: 3px solid white;
+            max-width: 80%;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.5) rotate(30deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        
+        .modal h2 {
+            margin-top: 0;
+            color: white;
+            font-size: 32px;
+            text-shadow: 0 0 10px black;
+        }
+        
+        .modal button {
+            margin-top: 20px;
+            background: black;
+            color: white;
+        }
+        
+        .powerup {
+            position: absolute;
+            font-size: 20px;
+            animation: float 2s infinite ease-in-out;
+            opacity: 0.7;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .powerup:hover {
+            opacity: 1;
+            transform: scale(1.5);
+        }
+        
+        .ultra-mode {
+            animation: ultraGlow 0.5s infinite alternate;
+        }
+        
+        @keyframes ultraGlow {
+            from { box-shadow: 0 0 20px #ff0000; }
+            to { box-shadow: 0 0 40px #ffff00; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="game-container">
+        <div class="advertisement">⚠️ WARNING: EXTREME GAME AHEAD! ⚠️</div>
+        
+        <h1 id="title">🔥 CRAZY TIC-TAC-TOE 🔥</h1>
+        
+        <p id="turn-message">Your turn - Place your ❌</p>
+        
+        <div class="board" id="board">
+            <!-- Tiles will be generated by JavaScript -->
+        </div>
+        
+        <button id="reset-btn">RESET GAME 🔄</button>
+        <button id="ultra-btn">ACTIVATE ULTRA MODE! 💥</button>
+        
+        <div class="game-rules">
+            <h3>⚡ GAME RULES (CRAZY EDITION):</h3>
+            <ul>
+                <li><strong>🎯 OBJECTIVE:</strong> Get 3 in a row (but the board might FLIP!)</li>
+                <li><strong>💥 POWER-UPS:</strong> Click floating emojis for special moves!</li>
+                <li><strong>🤖 COMPUTER:</strong> It CHEATS sometimes (deal with it)</li>
+                <li><strong>🌀 ULTRA MODE:</strong> Tiles shuffle, timer counts down, CHAOS!</li>
+                <li><strong>⚠️ WARNING:</strong> This game might explode your mind</li>
+            </ul>
+        </div>
+        
+        <div class="advertisement">💎 PLAY MORE CRAZY GAMES AT: CRAZY-GAMES.COM 💎</div>
+        
+        <div class="footer">Designed with ❤️ by: <a href="https://instagram.com/the.ispawoo" target="_blank">Yasir Ali</a> 👽</div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modal-message">YOU WIN! 🎉</h2>
+            <p id="modal-subtext">The crowd goes wild!</p>
+            <button id="modal-button">PLAY AGAIN! 🔥</button>
+        </div>
+    </div>
+
+    <!-- AUDIO FILES -->
+    <audio id="place-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" preload="auto"></audio>
+    <audio id="lose-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-lose-2027.mp3" preload="auto"></audio>
+    <audio id="draw-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-neutral-game-notification-951.mp3" preload="auto"></audio>
+    <audio id="powerup-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-extra-bonus-in-a-video-game-2045.mp3" preload="auto"></audio>
+    <audio id="ultra-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-show-suspense-waiting-668.mp3" preload="auto"></audio>
+    <audio id="explosion-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-explosion-impact-1684.mp3" preload="auto"></audio>
+
+    <script>
+        // ========== CRAZY GAME STATE ==========
+        const boardSize = 3;
+        let board = Array(boardSize).fill().map(() => Array(boardSize).fill(null));
+        let currentPlayer = 'human';
+        let gameActive = true;
+        let ultraMode = false;
+        let powerupsActive = false;
+        
+        // DOM elements
+        const boardElement = document.getElementById('board');
+        const resetBtn = document.getElementById('reset-btn');
+        const ultraBtn = document.getElementById('ultra-btn');
+        const modal = document.getElementById('modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalSubtext = document.getElementById('modal-subtext');
+        const modalButton = document.getElementById('modal-button');
+        const turnMessage = document.getElementById('turn-message');
+        const gameContainer = document.getElementById('game-container');
+        const title = document.getElementById('title');
+        
+        // Sound elements
+        const placeSound = document.getElementById('place-sound');
+        const winSound = document.getElementById('win-sound');
+        const loseSound = document.getElementById('lose-sound');
+        const drawSound = document.getElementById('draw-sound');
+        const powerupSound = document.getElementById('powerup-sound');
+        const ultraSound = document.getElementById('ultra-sound');
+        const explosionSound = document.getElementById('explosion-sound');
+        
+        // Power-up types
+        const powerups = [
+            { emoji: "🔄", name: "Shuffle Board", action: shuffleBoard },
+            { emoji: "❄️", name: "Freeze Computer", action: freezeComputer },
+            { emoji: "💣", name: "Explode Tile", action: explodeRandomTile },
+            { emoji: "🌀", name: "Rotate Board", action: rotateBoard },
+            { emoji: "🎲", name: "Random Move", action: makeRandomMove }
+        ];
+        
+        // ========== GAME INITIALIZATION ==========
+        function initGame() {
+            boardElement.innerHTML = '';
+            board = Array(boardSize).fill().map(() => Array(boardSize).fill(null));
+            gameActive = true;
+            currentPlayer = 'human';
+            ultraMode = false;
+            gameContainer.classList.remove('ultra-mode');
+            turnMessage.textContent = "Your turn - Place your ❌";
+            title.textContent = "🔥 CRAZY TIC-TAC-TOE 🔥";
+            
+            // Create board tiles
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const tile = document.createElement('div');
+                    tile.classList.add('tile');
+                    tile.dataset.row = row;
+                    tile.dataset.col = col;
+                    tile.addEventListener('click', () => handleTileClick(row, col));
+                    boardElement.appendChild(tile);
+                }
+            }
+            
+            // Reset button
+            resetBtn.addEventListener('click', resetGameWithExplosion);
+            
+            // Ultra mode button
+            ultraBtn.addEventListener('click', activateUltraMode);
+            
+            // Modal button
+            modalButton.addEventListener('click', () => {
+                modal.style.display = 'none';
+                resetGameWithExplosion();
+            });
+            
+            // Spawn initial power-ups
+            if (Math.random() > 0.5) spawnPowerUp();
+        }
+        
+        // ========== GAME LOGIC ==========
+        function handleTileClick(row, col) {
+            if (!gameActive || currentPlayer !== 'human' || board[row][col] !== null) return;
+            
+            // Place player's X with explosion effect
+            placeMove(row, col, 'x', 'human');
+            board[row][col] = 'x';
+            
+            if (checkWin('x')) {
+                endGame('win');
+                return;
+            }
+            
+            if (isBoardFull()) {
+                endGame('draw');
+                return;
+            }
+            
+            currentPlayer = 'computer';
+            turnMessage.textContent = "Computer's turn... 🤖";
+            
+            // In ultra mode, computer moves instantly
+            if (ultraMode) {
+                setTimeout(computerMove, 300);
+            } else {
+                setTimeout(computerMove, 1000);
+            }
+        }
+        
+        function placeMove(row, col, symbol, player) {
+            const tile = document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
+            tile.classList.add(symbol);
+            
+            // Play sound
+            placeSound.currentTime = 0;
+            placeSound.play();
+            
+            // Add explosion effect in ultra mode
+            if (ultraMode && Math.random() > 0.7) {
+                createExplosion(tile);
+            }
+        }
+        
+        function computerMove() {
+            if (!gameActive || currentPlayer !== 'computer') return;
+            
+            // In ultra mode, sometimes cheat!
+            if (ultraMode && Math.random() > 0.8) {
+                const emptyTiles = [];
+                for (let row = 0; row < boardSize; row++) {
+                    for (let col = 0; col < boardSize; col++) {
+                        if (board[row][col] === null) {
+                            emptyTiles.push({ row, col });
+                        }
+                    }
+                }
+                
+                if (emptyTiles.length > 0) {
+                    // Steal a player's tile!
+                    const playerTiles = [];
+                    for (let row = 0; row < boardSize; row++) {
+                        for (let col = 0; col < boardSize; col++) {
+                            if (board[row][col] === 'x') {
+                                playerTiles.push({ row, col });
+                            }
+                        }
+                    }
+                    
+                    if (playerTiles.length > 0) {
+                        const stealTile = playerTiles[Math.floor(Math.random() * playerTiles.length)];
+                        board[stealTile.row][stealTile.col] = 'o';
+                        const tileElement = document.querySelector(`.tile[data-row="${stealTile.row}"][data-col="${stealTile.col}"]`);
+                        tileElement.classList.remove('x');
+                        tileElement.classList.add('o');
+                        createExplosion(tileElement);
+                        turnMessage.textContent = "COMPUTER STOLE YOUR TILE! 😱";
+                        
+                        if (checkWin('o')) {
+                            endGame('lose');
+                            return;
+                        }
+                        
+                        currentPlayer = 'human';
+                        turnMessage.textContent = "Your turn - Place your ❌";
+                        return;
+                    }
+                }
+            }
+            
+            // Normal AI logic
+            let move = findWinningMove('o');
+            
+            if (!move) {
+                move = findWinningMove('x');
+            }
+            
+            if (!move) {
+                const emptyTiles = [];
+                for (let row = 0; row < boardSize; row++) {
+                    for (let col = 0; col < boardSize; col++) {
+                        if (board[row][col] === null) {
+                            emptyTiles.push({ row, col });
+                        }
+                    }
+                }
+                
+                if (emptyTiles.length > 0) {
+                    move = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+                }
+            }
+            
+            if (move) {
+                placeMove(move.row, move.col, 'o', 'computer');
+                board[move.row][move.col] = 'o';
+                
+                if (checkWin('o')) {
+                    endGame('lose');
+                    return;
+                }
+                
+                if (isBoardFull()) {
+                    endGame('draw');
+                    return;
+                }
+            }
+            
+            currentPlayer = 'human';
+            turnMessage.textContent = "Your turn - Place your ❌";
+            
+            // Spawn power-ups randomly
+            if (Math.random() > 0.7) spawnPowerUp();
+        }
+        
+        // ========== POWER-UPS ==========
+        function spawnPowerUp() {
+            if (!gameActive || powerupsActive) return;
+            
+            powerupsActive = true;
+            const powerup = powerups[Math.floor(Math.random() * powerups.length)];
+            
+            const powerupElement = document.createElement('div');
+            powerupElement.classList.add('powerup');
+            powerupElement.textContent = powerup.emoji;
+            powerupElement.title = powerup.name;
+            
+            // Random position near the board
+            const boardRect = boardElement.getBoundingClientRect();
+            const x = boardRect.left + Math.random() * boardRect.width;
+            const y = boardRect.top + Math.random() * boardRect.height;
+            
+            powerupElement.style.left = `${x}px`;
+            powerupElement.style.top = `${y}px`;
+            
+            document.body.appendChild(powerupElement);
+            
+            powerupElement.addEventListener('click', () => {
+                powerupSound.currentTime = 0;
+                powerupSound.play();
+                
+                powerup.action();
+                powerupElement.remove();
+                powerupsActive = false;
+                
+                // Add explosion effect
+                createExplosion(powerupElement);
+            });
+            
+            // Remove after 10 seconds if not clicked
+            setTimeout(() => {
+                if (document.body.contains(powerupElement)) {
+                    powerupElement.remove();
+                    powerupsActive = false;
+                }
+            }, 10000);
+        }
+        
+        function shuffleBoard() {
+            if (!gameActive) return;
+            
+            // Collect all non-empty tiles
+            const tiles = [];
+            const positions = [];
+            
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (board[row][col] !== null) {
+                        tiles.push(board[row][col]);
+                        positions.push({ row, col });
+                    }
+                    board[row][col] = null;
+                }
+            }
+            
+            // Shuffle the tiles
+            for (let i = tiles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+            }
+            
+            // Place them back
+            for (let i = 0; i < tiles.length; i++) {
+                const pos = positions[i];
+                board[pos.row][pos.col] = tiles[i];
+            }
+            
+            // Update display
+            updateBoardDisplay();
+            turnMessage.textContent = "BOARD SHUFFLED! 🔄";
+        }
+        
+        function freezeComputer() {
+            if (!gameActive || currentPlayer !== 'human') return;
+            
+            // Skip computer's turn
+            currentPlayer = 'human';
+            turnMessage.textContent = "COMPUTER FROZEN! ❄️ Your turn again!";
+            
+            // Add visual effect
+            boardElement.classList.add('glitch');
+            setTimeout(() => boardElement.classList.remove('glitch'), 1000);
+        }
+        
+        function explodeRandomTile() {
+            if (!gameActive) return;
+            
+            // Find a random non-empty tile
+            const tiles = [];
+            
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (board[row][col] !== null) {
+                        tiles.push({ row, col });
+                    }
+                }
+            }
+            
+            if (tiles.length > 0) {
+                const tile = tiles[Math.floor(Math.random() * tiles.length)];
+                board[tile.row][tile.col] = null;
+                
+                const tileElement = document.querySelector(`.tile[data-row="${tile.row}"][data-col="${tile.col}"]`);
+                tileElement.classList.remove('x', 'o');
+                createExplosion(tileElement);
+                
+                turnMessage.textContent = "TILE EXPLODED! 💣";
+            }
+        }
+        
+        function rotateBoard() {
+            if (!gameActive) return;
+            
+            // Rotate board 90 degrees clockwise
+            const newBoard = Array(boardSize).fill().map(() => Array(boardSize).fill(null));
+            
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    newBoard[col][boardSize - 1 - row] = board[row][col];
+                }
+            }
+            
+            board = newBoard;
+            updateBoardDisplay();
+            
+            // Add rotation animation
+            boardElement.style.transform = 'rotate(90deg)';
+            setTimeout(() => {
+                boardElement.style.transform = 'rotate(0)';
+            }, 500);
+            
+            turnMessage.textContent = "BOARD ROTATED! 🌀";
+        }
+        
+        function makeRandomMove() {
+            if (!gameActive || currentPlayer !== 'human') return;
+            
+            const emptyTiles = [];
+            
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (board[row][col] === null) {
+                        emptyTiles.push({ row, col });
+                    }
+                }
+            }
+            
+            if (emptyTiles.length > 0) {
+                const move = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
+                placeMove(move.row, move.col, 'x', 'human');
+                board[move.row][move.col] = 'x';
+                
+                if (checkWin('x')) {
+                    endGame('win');
+                    return;
+                }
+                
+                if (isBoardFull()) {
+                    endGame('draw');
+                    return;
+                }
+                
+                currentPlayer = 'computer';
+                turnMessage.textContent = "RANDOM MOVE! 🎲 Computer's turn...";
+                setTimeout(computerMove, 1000);
+            }
+        }
+        
+        // ========== ULTRA MODE ==========
+        function activateUltraMode() {
+            if (ultraMode || !gameActive) return;
+            
+            ultraMode = true;
+            gameContainer.classList.add('ultra-mode');
+            title.textContent = "💥 ULTRA MODE ACTIVATED! 💥";
+            turnMessage.textContent = "CHAOS INCOMING! 🌪️";
+            
+            ultraSound.currentTime = 0;
+            ultraSound.play();
+            
+            // Add crazy effects
+            boardElement.classList.add('glitch');
+            setTimeout(() => boardElement.classList.remove('glitch'), 2000);
+            
+            // Random board transformations
+            const effects = [shuffleBoard, rotateBoard, explodeRandomTile];
+            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+            setTimeout(randomEffect, 1500);
+            
+            // Spawn more power-ups
+            setTimeout(() => {
+                spawnPowerUp();
+                setTimeout(spawnPowerUp, 3000);
+            }, 2000);
+        }
+        
+        // ========== GAME EFFECTS ==========
+        function createExplosion(element) {
+            explosionSound.currentTime = 0;
+            explosionSound.play();
+            
+            const rect = element.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            const explosion = document.createElement('div');
+            explosion.classList.add('explosion');
+            explosion.textContent = "💥";
+            explosion.style.left = `${x}px`;
+            explosion.style.top = `${y}px`;
+            
+            document.body.appendChild(explosion);
+            
+            setTimeout(() => explosion.remove(), 1000);
+        }
+        
+        function createCelebration() {
+            const emojis = ["✨", "⭐", "🌟", "🎉", "💥", "🔥", "😎", "👑"];
+            const boardRect = boardElement.getBoundingClientRect();
+            
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                star.style.left = `${boardRect.left + Math.random() * boardRect.width}px`;
+                star.style.top = `${boardRect.top - 50}px`;
+                star.style.animationDelay = `${Math.random() * 0.5}s`;
+                star.style.fontSize = `${Math.random() * 20 + 20}px`;
+                
+                document.body.appendChild(star);
+                
+                setTimeout(() => star.remove(), 2000);
+            }
+        }
+        
+        // ========== GAME UTILITIES ==========
+        function updateBoardDisplay() {
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const tile = document.querySelector(`.tile[data-row="${row}"][data-col="${col}"]`);
+                    tile.className = 'tile';
+                    if (board[row][col] === 'x') tile.classList.add('x');
+                    if (board[row][col] === 'o') tile.classList.add('o');
+                }
+            }
+        }
+        
+        function findWinningMove(symbol) {
+            // Check rows
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (board[row][col] === null) {
+                        board[row][col] = symbol;
+                        if (checkWin(symbol)) {
+                            board[row][col] = null;
+                            return { row, col };
+                        }
+                        board[row][col] = null;
+                    }
+                }
+            }
+            
+            // Check columns
+            for (let col = 0; col < boardSize; col++) {
+                for (let row = 0; row < boardSize; row++) {
+                    if (board[row][col] === null) {
+                        board[row][col] = symbol;
+                        if (checkWin(symbol)) {
+                            board[row][col] = null;
+                            return { row, col };
+                        }
+                        board[row][col] = null;
+                    }
+                }
+            }
+            
+            // Check diagonals
+            if (board[1][1] === null) {
+                if ((board[0][0] === symbol && board[2][2] === symbol) ||
+                    (board[0][2] === symbol && board[2][0] === symbol)) {
+                    return { row: 1, col: 1 };
+                }
+            }
+            
+            return null;
+        }
+        
+        function checkWin(symbol) {
+            // Check rows
+            for (let row = 0; row < boardSize; row++) {
+                if (board[row][0] === symbol && 
+                    board[row][1] === symbol && 
+                    board[row][2] === symbol) {
+                    return true;
+                }
+            }
+            
+            // Check columns
+            for (let col = 0; col < boardSize; col++) {
+                if (board[0][col] === symbol && 
+                    board[1][col] === symbol && 
+                    board[2][col] === symbol) {
+                    return true;
+                }
+            }
+            
+            // Check diagonals
+            if (board[0][0] === symbol && 
+                board[1][1] === symbol && 
+                board[2][2] === symbol) {
+                return true;
+            }
+            
+            if (board[0][2] === symbol && 
+                board[1][1] === symbol && 
+                board[2][0] === symbol) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        function isBoardFull() {
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (board[row][col] === null) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        function endGame(result) {
+            gameActive = false;
+            powerupsActive = false;
+            
+            // Remove any remaining power-ups
+            document.querySelectorAll('.powerup').forEach(p => p.remove());
+            
+            // Play sound
+            if (result === 'win') {
+                winSound.currentTime = 0;
+                winSound.play();
+                createCelebration();
+            } else if (result === 'lose') {
+                loseSound.currentTime = 0;
+                loseSound.play();
+            } else {
+                drawSound.currentTime = 0;
+                drawSound.play();
+            }
+            
+            // Show modal
+            if (result === 'win') {
+                modalMessage.textContent = "YOU WIN! 🎉";
+                modalSubtext.textContent = ultraMode ? "ULTRA VICTORY! LEGENDARY!" : "Great job!";
+            } else if (result === 'lose') {
+                modalMessage.textContent = "YOU LOSE! 💀";
+                modalSubtext.textContent = ultraMode ? "The computer dominated ULTRA MODE!" : "Better luck next time!";
+            } else {
+                modalMessage.textContent = "DRAW! 🤝";
+                modalSubtext.textContent = "The battle was even!";
+            }
+            
+            modal.style.display = 'flex';
+        }
+        
+        function resetGameWithExplosion() {
+            // Add explosion effect to all tiles
+            document.querySelectorAll('.tile').forEach(tile => {
+                if (tile.classList.contains('x') || tile.classList.contains('o')) {
+                    createExplosion(tile);
+                }
+            });
+            
+            // Reset after delay
+            setTimeout(initGame, 500);
+        }
+        
+        // Initialize the game when the page loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>
